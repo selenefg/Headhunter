@@ -14,7 +14,7 @@ SecHeaders = {
     "Referrer": "Referrer-Policy"
 }
 
-SecHeadersDefinitions = {
+SecHeadersDescriptions = {
 
     "STS": "\n\tHTTP Strict Transport Security is an excellent feature to support on your site and strengthens\n"
            "\tyour implementation of TLS by getting the User Agent to enforce the use of HTTPS.\n"
@@ -38,8 +38,9 @@ def CheckSecurityHeaders(url): #(url, ssl)
     
     req =  requests.get(url)
     for header in SecHeaders:
-        if SecHeaders[header] in req.headers: print("[+] " + Fore.RED + SecHeaders[header] + Style.RESET_ALL + SecHeadersDefinitions[header])
-        else: print("[+] " + Fore.GREEN + SecHeaders[header] + Style.RESET_ALL) 
+        if SecHeaders[header] in req.headers: print("\t" + Fore.RED + "[!] " + Style.RESET_ALL + SecHeaders[header] + " not found" +
+                                                    Fore.RED + "\n\tDefinition:" + Style.RESET_ALL + "\t" +SecHeadersDescriptions[header] + "\n")
+        else: print(Fore.GREEN + "[+] " + Style.RESET_ALL + SecHeaders[header] + "\n") 
 
 def main():
     parser = argparse.ArgumentParser()
@@ -48,6 +49,7 @@ def main():
     args = parser.parse_args()
     
     for url in args.url:
+        print("Analizing headers...\n")
         CheckSecurityHeaders(url) #(url,args.ssl)
 
 if __name__ == '__main__':
