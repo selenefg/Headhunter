@@ -32,9 +32,6 @@ SecHeadersDescriptions = {
 }
 
 def FindMissingSecurityHeaders(url):
-    if not 'https://' in url:
-        sys.exit("missing \"https://\"")
-    
     req =  requests.get(url)
     for header in SecHeaders:
         if SecHeaders[header] in req.headers: print("\t" + Fore.RED + "[!] " + Style.RESET_ALL + SecHeaders[header] + " not found" +
@@ -64,6 +61,7 @@ def main():
     args = parser.parse_args()
     
     for url in args.url:
+        if not 'https://' in url: sys.exit("missing \"https://\"")
         print("======Analizing headers...======\n")
         FindMissingSecurityHeaders(url)
         print("======Analizing cookies...======\n")
