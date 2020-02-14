@@ -1,5 +1,6 @@
 import argparse
 import requests
+from requests.auth import HTTPBasicAuth
 import sys
 import colorama
 from colorama import Fore, Style
@@ -52,9 +53,18 @@ def FindInsecureCookies(url):
         if cookie.domain_initial_dot: print(Fore.GREEN + "[+] " + Style.RESET_ALL + "Well defined domain")
         else: print(Fore.RED + "[!] " + Style.RESET_ALL + "Loosely defined domain")  
 
+def ForceBasicAuth(url, username, password):
+    req = requests.get(url, auth=HTTPBasicAuth(username, password))
+    if req.status_code == 200:
+        print("Username: " + str(username) + " / Password: " + str(password))
+        print(Fore.GREEN + "[Success] " + Style.RESET_ALL + "status code " + str(req.status_code))
+    else: print(Fore.RED + "[Error] " + Style.RESET_ALL + "status code " + str(req.status_code))
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-u','--url',required=True,nargs='+',help="The URL to be scanned")
+    parser.add_argument('-U','--username',required=False,nargs='+',help="Username for basic-auth")
+    parser.add_argument('-P','--password',required=False,nargs='+',help="Password for basic-auth")
     #parser.add_argument('-x PROXY', '--proxy PROXY',required=False,nargs='+',help="Set the proxy server (example: 192.168.1.1:8080)")
     #parser.add_argument('-D', '--definitions',required=False,nargs='+',help="Print the purpose and functionality of each missing header")
 
@@ -66,6 +76,8 @@ def main():
         FindMissingSecurityHeaders(url)
         print("======Analizing cookies...======\n")
         FindInsecureCookies(url)
+        print("\n======Testing basic-auth...======\n")
+        ForceBasicAuth(url, args.username, args.password)
 
 if __name__ == '__main__':
     main()
