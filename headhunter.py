@@ -31,8 +31,7 @@ SecHeadersDescriptions = {
                "\tBy whitelisting sources of approved content, you can prevent the browser from loading malicious assets."
 }
 
-def CheckSecurityHeaders(url): #(url, ssl) 
-#if ssl == True:
+def FindMissingSecurityHeaders(url):
     if not 'https://' in url:
         sys.exit("missing \"https://\"")
     
@@ -42,15 +41,33 @@ def CheckSecurityHeaders(url): #(url, ssl)
                                                     Fore.RED + "\n\tDefinition:" + Style.RESET_ALL + "\t" +SecHeadersDescriptions[header] + "\n")
         else: print(Fore.GREEN + "[+] " + Style.RESET_ALL + SecHeaders[header] + "\n") 
 
+def FindInsecureCookies(url):
+    req =  requests.get(url)
+    for cookie in req.cookies:
+        print("\nName:" + cookie.name + "\nValue:" + cookie.value)
+
+        if cookie.secure: print(Fore.GREEN + "[+] " + Style.RESET_ALL + "Secure")
+        else: print(Fore.RED + "[!] " + Style.RESET_ALL + "Secure attribute missing") 
+
+        if 'httponly' in cookie._rest.keys():print(Fore.GREEN + "[+] " + Style.RESET_ALL + "HTTPOnly")
+        else: print(Fore.RED + "[!] " + Style.RESET_ALL + "HTTPOnly attribute missing") 
+
+        if cookie.domain_initial_dot: print(Fore.GREEN + "[+] " + Style.RESET_ALL + "Well defined domain")
+        else: print(Fore.RED + "[!] " + Style.RESET_ALL + "Loosely defined domain")  
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-u','--url',required=True,nargs='+',help='URL you need Scan')
-    #parser.add_argument('-ssl', '--ssl',action="store_true",help='URL you need Scan')
+    parser.add_argument('-u','--url',required=True,nargs='+',help="The URL to be scanned")
+    #parser.add_argument('-x PROXY', '--proxy PROXY',required=False,nargs='+',help="Set the proxy server (example: 192.168.1.1:8080)")
+    #parser.add_argument('-D', '--definitions',required=False,nargs='+',help="Print the purpose and functionality of each missing header")
+
     args = parser.parse_args()
     
     for url in args.url:
-        print("Analizing headers...\n")
-        CheckSecurityHeaders(url) #(url,args.ssl)
+        print("======Analizing headers...======\n")
+        FindMissingSecurityHeaders(url)
+        print("======Analizing cookies...======\n")
+        FindInsecureCookies(url)
 
 if __name__ == '__main__':
     main()
