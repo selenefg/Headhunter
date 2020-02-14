@@ -1,2 +1,2 @@
 # Headhunter
-Welcome to *Headhunter*, a security scanner for HTTP response headers.
+Welcome to **Headhunter**, a security scanner for HTTP response headers.
