@@ -53,7 +53,7 @@ def FindInsecureCookies(url):
         if cookie.domain_initial_dot: print(Fore.GREEN + "[+] " + Style.RESET_ALL + "Well defined domain")
         else: print(Fore.RED + "[!] " + Style.RESET_ALL + "Loosely defined domain")  
 
-def ForceBasicAuth(url, username, password):
+def BasicAuth(url, username, password):
     req = requests.get(url, auth=HTTPBasicAuth(username, password))
     if req.status_code == 200:
         print("Username: " + str(username) + " / Password: " + str(password))
@@ -77,7 +77,7 @@ def main():
         print("======Analizing cookies...======\n")
         FindInsecureCookies(url)
         print("\n======Testing basic-auth...======\n")
-        ForceBasicAuth(url, args.username, args.password)
+        BasicAuth(url, args.username, args.password)
 
 if __name__ == '__main__':
     main()
