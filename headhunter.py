@@ -12,7 +12,7 @@ SecHeaders = {
     "XContent": "X-Content-Type-Options",
     "Content": "Content-Security-Policy",
     "XPerm": "X-Permitted-Cross-Domain-Policies",
-    "Referrer": "Referrer-Policy"
+    "Referrer": "Referrer-Policy",
 }
 
 SecHeadersDescriptions = {
@@ -29,31 +29,44 @@ SecHeadersDescriptions = {
                 "\tto stick with the declared content-type.\n"
                 "\tThe only valid value for this header is: \"X-Content-Type-Options: nosniff\".",
     "Content": "\n\tContent Security Policy is an effective measure to protect your site from XSS attacks.\n"
-               "\tBy whitelisting sources of approved content, you can prevent the browser from loading malicious assets."
+               "\tBy whitelisting sources of approved content, you can prevent the browser from loading malicious assets.",
+    "XPerm": "TO-DO",#TODO
+    "Referrer": "TO-DO",#TODO
 }
 
-def FindMissingSecurityHeaders(url):
+def report (thing, condition, success, failure, tabbed_failure = False):
+    green_plus = Fore.GREEN + "[+] " + Style.RESET_ALL
+    red_exclamation = Fore.RED + "[!] " + Style.RESET_ALL
+    if condition(thing):
+        print(green_plus + success)
+    else: 
+        if tabbed_failure:
+            print("\t", end='')
+        print(red_exclamation + failure)
+
+def report_on_missing_headers(url):
     req =  requests.get(url)
     for header in SecHeaders:
-        if SecHeaders[header] in req.headers: print("\t" + Fore.RED + "[!] " + Style.RESET_ALL + SecHeaders[header] + " not found" +
-                                                    Fore.RED + "\n\tDefinition:" + Style.RESET_ALL + "\t" +SecHeadersDescriptions[header] + "\n")
-        else: print(Fore.GREEN + "[+] " + Style.RESET_ALL + SecHeaders[header] + "\n") 
+        report(header, 
+               lambda h: SecHeaders[h] not in req.headers, 
+               SecHeaders[header] + "\n", 
+               SecHeaders[header] + " not found" + Fore.RED + "\n\tDefinition:" + Style.RESET_ALL + "\t" +SecHeadersDescriptions[header] + "\n",
+               True)
 
-def FindInsecureCookies(url):
+
+def report_on_cookies(url):
+    cookie_tests = [
+        [lambda c: c.secure, "Secure", "Secure attribute missing"],
+        [lambda c: 'httponly' in c._rest.keys(), "HTTPOnly", "HTTPOnly attribute missing"],
+        [lambda c: c.domain_initial_dot, "Well defined domain", "Loosely defined domain"],
+    ] 
     req =  requests.get(url)
     for cookie in req.cookies:
         print("\nName:" + cookie.name + "\nValue:" + cookie.value)
+        for test in cookie_tests:
+            report(cookie, test[0], test[1], test[2])
 
-        if cookie.secure: print(Fore.GREEN + "[+] " + Style.RESET_ALL + "Secure")
-        else: print(Fore.RED + "[!] " + Style.RESET_ALL + "Secure attribute missing") 
-
-        if 'httponly' in cookie._rest.keys():print(Fore.GREEN + "[+] " + Style.RESET_ALL + "HTTPOnly")
-        else: print(Fore.RED + "[!] " + Style.RESET_ALL + "HTTPOnly attribute missing") 
-
-        if cookie.domain_initial_dot: print(Fore.GREEN + "[+] " + Style.RESET_ALL + "Well defined domain")
-        else: print(Fore.RED + "[!] " + Style.RESET_ALL + "Loosely defined domain")  
-
-def BasicAuth(url, username, password):
+def basic_auth(url, username, password):
     req = requests.get(url, auth=HTTPBasicAuth(username, password))
     if req.status_code == 200:
         print("Username: " + str(username) + " / Password: " + str(password))
@@ -73,11 +86,11 @@ def main():
     for url in args.url:
         if not 'https://' in url: url = "https://" + url
         print("======Analizing headers...======\n")
-        FindMissingSecurityHeaders(url)
+        report_on_missing_headers(url)
         print("======Analizing cookies...======\n")
-        FindInsecureCookies(url)
+        report_on_cookies(url)
         print("\n======Testing basic-auth...======\n")
-        BasicAuth(url, args.username, args.password)
+        basic_auth(url, args.username, args.password)
 
 if __name__ == '__main__':
     main()
