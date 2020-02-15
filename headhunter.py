@@ -71,7 +71,7 @@ def main():
     args = parser.parse_args()
     
     for url in args.url:
-        if not 'https://' in url: sys.exit("missing \"https://\"")
+        if not 'https://' in url: url = "https://" + url
         print("======Analizing headers...======\n")
         FindMissingSecurityHeaders(url)
         print("======Analizing cookies...======\n")
