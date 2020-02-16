@@ -9,14 +9,12 @@ def report_on_missing_headers(url, require_description):
     print_block("Analizing headers", 1)
     req =  requests.get(url)
     for header in SecHeaders:
-
         if require_description:
             description = Fore.RED + "\n\tDescription:" + Style.RESET_ALL + "\t" +SecHeadersDescriptions[header]
             tabbed = True
         else:
             description = ""
             tabbed = False
-        
         report(header, 
                lambda h: HTTPHeaderEntries[h] not in req.headers, 
                HTTPHeaderEntries[header], 

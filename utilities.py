@@ -7,7 +7,7 @@ def print_block(text, border_length, character='*'):
     print(border_length * character + ' ' + text +  ' ' + border_length * character)
     print((2 * border_length + length) * character)
 
-def report (thing, condition, success, failure, tabbed_failure = False):
+def report(thing, condition, success, failure, tabbed_failure = False):
     green_plus = Fore.GREEN + "[+] " + Style.RESET_ALL
     red_exclamation = Fore.RED + "[!] " + Style.RESET_ALL
     if condition(thing):
