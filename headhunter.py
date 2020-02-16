@@ -44,14 +44,22 @@ def report (thing, condition, success, failure, tabbed_failure = False):
             print("\t", end='')
         print(red_exclamation + failure)
 
-def report_on_missing_headers(url):
+def report_on_missing_headers(url, definitions):
     req =  requests.get(url)
     for header in SecHeaders:
+
+        if definitions:
+            definition = Fore.RED + "\n\tDefinition:" + Style.RESET_ALL + "\t" +SecHeadersDescriptions[header]
+            tabbed = True
+        else:
+            definition = ""
+            tabbed = False
+        
         report(header, 
                lambda h: SecHeaders[h] not in req.headers, 
                SecHeaders[header] + "\n", 
-               SecHeaders[header] + " not found" + Fore.RED + "\n\tDefinition:" + Style.RESET_ALL + "\t" +SecHeadersDescriptions[header] + "\n",
-               True)
+               SecHeaders[header] + " not found" + definition + "\n",
+               tabbed)
 
 
 def report_on_cookies(url):
@@ -75,18 +83,19 @@ def basic_auth(url, username, password):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-u','--url',required=True,nargs='+',help="The URL to be scanned")
-    parser.add_argument('-U','--username',required=False,nargs='+',help="Username for basic-auth")
-    parser.add_argument('-P','--password',required=False,nargs='+',help="Password for basic-auth")
+    parser.add_argument('-u', '--url', required=True,nargs='+', help="The URL to be scanned")
+    parser.add_argument('-U', '--username', nargs='+', help="Username for basic-auth")
+    parser.add_argument('-P', '--password', nargs='+', help="Password for basic-auth")
     #parser.add_argument('-x PROXY', '--proxy PROXY',required=False,nargs='+',help="Set the proxy server (example: 192.168.1.1:8080)")
-    #parser.add_argument('-D', '--definitions',required=False,nargs='+',help="Print the purpose and functionality of each missing header")
+    parser.add_argument('-d', '--definitions', action='store_true', help="Print the purpose and functionality of each missing header")
 
     args = parser.parse_args()
+    print(args)
     
     for url in args.url:
         if not 'https://' in url: url = "https://" + url
         print("======Analizing headers...======\n")
-        report_on_missing_headers(url)
+        report_on_missing_headers(url, args.definitions is not None)
         print("======Analizing cookies...======\n")
         report_on_cookies(url)
         print("\n======Testing basic-auth...======\n")
