@@ -5,12 +5,12 @@ import sys
 from definitions import *
 from utilities import *
 
-def report_on_missing_headers(url, descriptions):
+def report_on_missing_headers(url, require_description):
     print_block("Analizing headers", 1)
     req =  requests.get(url)
     for header in SecHeaders:
 
-        if descriptions:
+        if require_description:
             description = Fore.RED + "\n\tDescription:" + Style.RESET_ALL + "\t" +SecHeadersDescriptions[header]
             tabbed = True
         else:
@@ -18,9 +18,9 @@ def report_on_missing_headers(url, descriptions):
             tabbed = False
         
         report(header, 
-               lambda h: SecHeaders[h] not in req.headers, 
-               SecHeaders[header], 
-               SecHeaders[header] + " not found" + description,
+               lambda h: HTTPHeaderEntries[h] not in req.headers, 
+               HTTPHeaderEntries[header], 
+               HTTPHeaderEntries[header] + " not found" + description,
                tabbed)
     print('')
 
@@ -39,7 +39,7 @@ def report_on_cookies(url):
             report(cookie, test[0], test[1], test[2])
     print('')
 
-def basic_auth(url, username, password):
+def report_on_basic_auth(url, username, password):
     print_block("Testing basic_auth", 1)
     req = requests.get(url, auth=HTTPBasicAuth(username, password))
     if req.status_code == 200:
@@ -62,7 +62,7 @@ def main():
         if not 'https://' in url: url = "https://" + url                
         report_on_missing_headers(url, args.definitions is not None)
         report_on_cookies(url)
-        basic_auth(url, args.username, args.password)
+        report_on_basic_auth(url, args.username, args.password)
 
 if __name__ == '__main__':
     main()

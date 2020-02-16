@@ -1,4 +1,6 @@
-SecHeaders = {
+SecHeaders = ["STS", "XFrame", "XSS", "XContent", "Content", "XPerm", "Referrer"]
+
+HTTPHeaderEntries = {
     "STS": "strict-transport-security",
     "XFrame": "X-Frame-Options",
     "XSS": "XSS Protection",
