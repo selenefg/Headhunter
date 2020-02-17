@@ -47,6 +47,9 @@ def report_on_basic_auth(url, username, password):
         print(Fore.RED + "[Error] " + Style.RESET_ALL + "status code " + str(req.status_code))
     print('')
 
+def add_transfer_encoding_header():
+    print_block("Adding Transfer-Enconding header", 1)
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-u', '--url', required=True,nargs='+', help="The URL to be scanned")
@@ -54,13 +57,15 @@ def main():
     parser.add_argument('-P', '--password', nargs='+', help="Password for basic-auth")
     #parser.add_argument('-x PROXY', '--proxy PROXY',required=False,nargs='+',help="Set the proxy server (example: 192.168.1.1:8080)")
     parser.add_argument('-d', '--definitions', action='store_true', help="Print the purpose and functionality of each missing header")
+    parser.add_argument('-a', '--addheader', action='store_true', help="Add HTTP header")
 
     args = parser.parse_args()    
     for url in args.url:
-        if not 'https://' in url: url = "https://" + url                
+        if not 'https://' in url: url = "https://" + url 
         report_on_missing_headers(url, args.definitions is not None)
         report_on_cookies(url)
         report_on_basic_auth(url, args.username, args.password)
+        if args.addheader is not None: add_transfer_encoding_header()
 
 if __name__ == '__main__':
     main()

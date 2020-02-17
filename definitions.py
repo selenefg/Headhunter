@@ -3,7 +3,7 @@ SecHeaders = ["STS", "XFrame", "XSS", "XContent", "Content", "XPerm", "Referrer"
 HTTPHeaderEntries = {
     "STS": "strict-transport-security",
     "XFrame": "X-Frame-Options",
-    "XSS": "XSS Protection",
+    "XSS": "X-XSS-Protection",
     "XContent": "X-Content-Type-Options",
     "Content": "Content-Security-Policy",
     "XPerm": "X-Permitted-Cross-Domain-Policies",
@@ -28,3 +28,19 @@ SecHeadersDescriptions = {
     "XPerm": "TO-DO",#TODO
     "Referrer": "TO-DO",#TODO
 }
+
+# Transfer-Encoding: xchunked
+
+# Transfer-Encoding : chunked
+
+# Transfer-Encoding: chunked
+# Transfer-Encoding: x
+
+# Transfer-Encoding:[tab]chunked
+
+# [space]Transfer-Encoding: chunked
+
+# X: X[\n]Transfer-Encoding: chunked
+
+# Transfer-Encoding
+# : chunked
