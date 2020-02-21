@@ -50,22 +50,23 @@ def report_on_basic_auth(url, username, password):
 def add_transfer_encoding_header():
     print_block("Adding Transfer-Enconding header", 1)
 
-def main():
+def main(arg):
     parser = argparse.ArgumentParser()
-    parser.add_argument('-u', '--url', required=True,nargs='+', help="The URL to be scanned")
     parser.add_argument('-U', '--username', nargs='+', help="Username for basic-auth")
     parser.add_argument('-P', '--password', nargs='+', help="Password for basic-auth")
     #parser.add_argument('-x PROXY', '--proxy PROXY',required=False,nargs='+',help="Set the proxy server (example: 192.168.1.1:8080)")
     parser.add_argument('-d', '--definitions', action='store_true', help="Print the purpose and functionality of each missing header")
     parser.add_argument('-a', '--addheader', action='store_true', help="Add HTTP header")
 
-    args = parser.parse_args()    
-    for url in args.url:
+    args, unknown = parser.parse_known_args()
+    if len(arg) == 2:        
+        url = arg[1]
         if not 'https://' in url: url = "https://" + url 
         report_on_missing_headers(url, args.definitions is not None)
         report_on_cookies(url)
         report_on_basic_auth(url, args.username, args.password)
         if args.addheader is not None: add_transfer_encoding_header()
+    else: print("One URL argument required")
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)
