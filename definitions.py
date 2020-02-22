@@ -28,14 +28,13 @@ SecHeadersDescriptions = {
   "Referrer": "TO-DO",#TODO
 }
 
-TransferEnconding = {
-  "Transfer-Encoding: xchunked"
-  "Transfer-Encoding : chunked"
-  "Transfer-Encoding: chunked"
-  "Transfer-Encoding: x"
-  "Transfer-Encoding:[tab]chunked"
-  "[space]Transfer-Encoding: chunked"
-  "X: X[\n]Transfer-Encoding: chunked"
-  "Transfer-Encoding"
-  ": chunked"
+TransferEncondingHeader = {
+  "1": ["Transfer-Encoding:"," chunked"],
+  "2": ["Transfer-Encoding :"," chunked"],
+  "3": ["Transfer-Encoding:"," xchunked"],
+  "4": ["Transfer-Encoding:"," x"],
+  "5": ["Transfer-Encoding:","[tab]chunked"],
+  "6": ["[space]Transfer-Encoding:"," chunked"],
+  "7": ["X: X[\n]Transfer-Encoding:"," chunked"],
+  "8": ["Transfer-Encoding\n:"," chunked"],
 }

@@ -1,6 +1,7 @@
 import argparse
 import requests
 from requests.auth import HTTPBasicAuth
+import urllib
 import sys
 from definitions import *
 from utilities import *
@@ -47,8 +48,15 @@ def report_on_basic_auth(url, username, password):
         print(Fore.RED + "[Error] " + Style.RESET_ALL + "status code " + str(req.status_code))
     print('')
 
-def add_transfer_encoding_header():
+def add_transfer_encoding_header(url):
     print_block("Adding Transfer-Enconding header", 1)
+    response = urllib.request.Request(url)
+    for header in TransferEncondingHeader:
+        if response.has_header(header) == True: 
+            print("Header already added")
+            exit()
+    response.add_header(TransferEncondingHeader["1"][0], TransferEncondingHeader["1"][1])
+    print(response.headers)
 
 def main(arg):
     parser = argparse.ArgumentParser()
@@ -65,7 +73,7 @@ def main(arg):
         report_on_missing_headers(url, args.definitions)
         report_on_cookies(url)
         report_on_basic_auth(url, args.username, args.password)
-        if args.addheader is not None: add_transfer_encoding_header()
+        if args.addheader is not None: add_transfer_encoding_header(url)
     else: print("One URL argument required")
 
 if __name__ == '__main__':
