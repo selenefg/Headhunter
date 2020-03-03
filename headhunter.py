@@ -73,8 +73,8 @@ def main(arg):
         print(requests.get(url))
         report_on_missing_headers(url, args.definitions)
         report_on_cookies(url)
-        report_on_basic_auth(url, args.username, args.password)
-        if args.addheader is not None: add_transfer_encoding_header(url)
+        if args.username or args.password: report_on_basic_auth(url, args.username, args.password)
+        if args.addheader: add_transfer_encoding_header(url)
     else: print("One URL argument required")
 
 if __name__ == '__main__':
