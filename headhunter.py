@@ -69,7 +69,8 @@ def main(arg):
     args, unknown = parser.parse_known_args()
     if len(arg) > 1:        
         url = arg[1]
-        if not 'https://' in url: url = "https://" + url 
+        if not 'https://' in url: url = "https://" + url
+        print(requests.get(url))
         report_on_missing_headers(url, args.definitions)
         report_on_cookies(url)
         report_on_basic_auth(url, args.username, args.password)
