@@ -7,7 +7,7 @@ from definitions import *
 from utilities import *
 
 def report_on_missing_headers(url, require_description):
-    print_block("Analizing headers", 1)
+    print_block("Analyzing headers", 1)
     req =  requests.get(url)
     for header in SecHeaders:
         if require_description:
@@ -24,7 +24,7 @@ def report_on_missing_headers(url, require_description):
     print('')
 
 def report_on_cookies(url):
-    print_block("Analizing cookies", 1)
+    print_block("Analyzing cookies", 1)
     cookie_tests = [
         [lambda c: c.secure, "Secure", "Secure attribute missing"],
         [lambda c: 'httponly' in c._rest.keys(), "HTTPOnly", "HTTPOnly attribute missing"],
