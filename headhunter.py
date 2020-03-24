@@ -7,11 +7,11 @@ from definitions import *
 from utilities import *
 
 def report_on_missing_headers(url, require_description):
-    print_block("Analyzing headers", 1)
+    print_underlined("Analyzing headers\n")
     req =  requests.get(url)
     for header in SecHeaders:
         if require_description:
-            description = Fore.RED + "\n\tDescription:" + Style.RESET_ALL + "\t" +SecHeadersDescriptions[header]
+            description = Fore.RED + "\nDescription:" + Style.RESET_ALL +SecHeadersDescriptions[header]
             tabbed = True
         else:
             description = ""
@@ -24,7 +24,7 @@ def report_on_missing_headers(url, require_description):
     print('')
 
 def report_on_cookies(url):
-    print_block("Analyzing cookies", 1)
+    print_underlined("Analyzing cookies\n")
     cookie_tests = [
         [lambda c: c.secure, "Secure", "Secure attribute missing"],
         [lambda c: 'httponly' in c._rest.keys(), "HTTPOnly", "HTTPOnly attribute missing"],
@@ -39,7 +39,7 @@ def report_on_cookies(url):
     print('')
 
 def report_on_basic_auth(url, username, password):
-    print_block("Testing basic_auth", 1)
+    print_underlined("Testing basic_auth\n")
     req = requests.get(url, auth=HTTPBasicAuth(username, password))
     if req.status_code == 200:
         print("Username: " + str(username) + " / Password: " + str(password))
@@ -49,7 +49,7 @@ def report_on_basic_auth(url, username, password):
     print('')
 
 def add_transfer_encoding_header(url):
-    print_block("Adding Transfer-Enconding header", 1)
+    print_underlined("Adding Transfer-Enconding header\n")
     response = urllib.request.Request(url)
     for header in TransferEncondingHeader:
         if response.has_header(header) == True: 
