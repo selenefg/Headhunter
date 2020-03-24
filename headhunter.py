@@ -69,13 +69,13 @@ def main(arg):
     args, unknown = parser.parse_known_args()
     if len(arg) > 1:        
         url = arg[1]
-        if not 'https://' in url: url = "https://" + url
-        print(requests.get(url))
-        report_on_missing_headers(url, args.definitions)
-        report_on_cookies(url)
-        if args.username or args.password: report_on_basic_auth(url, args.username, args.password)
-        if args.addheader: add_transfer_encoding_header(url)
-    else: print("One URL argument required")
+    else:
+        sys.exit('One URL argument required')
+    print(requests.get(url))
+    report_on_missing_headers(url, args.definitions)
+    report_on_cookies(url)
+    if args.username or args.password: report_on_basic_auth(url, args.username, args.password)
+    if args.addheader: add_transfer_encoding_header(url)
 
 if __name__ == '__main__':
     main(sys.argv)
