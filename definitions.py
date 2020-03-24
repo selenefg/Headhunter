@@ -1,4 +1,4 @@
-SecHeaders = ["STS", "XFrame", "XSS", "XContent", "Content", "XPerm", "Referrer"]
+SecHeaders = ["STS", "XFrame", "XSS", "XContent", "Content", "Cache"]
 
 HTTPHeaderEntries = {
   "STS": "Strict-Transport-Security",
@@ -6,8 +6,9 @@ HTTPHeaderEntries = {
   "XSS": "X-XSS-Protection",
   "XContent": "X-Content-Type-Options",
   "Content": "Content-Security-Policy",
-  "XPerm": "X-Permitted-Cross-Domain-Policies",
-  "Referrer": "Referrer-Policy",
+  "Cache": "Cache-Control",
+  #"XPerm": "X-Permitted-Cross-Domain-Policies",
+  #"Referrer": "Referrer-Policy",
 }
 
 SecHeadersDescriptions = {
@@ -29,8 +30,9 @@ SecHeadersDescriptions = {
              "If enabled, CSP has significant impact on the way browsers render pages (e.g., inline JavaScript\n"
              "disabled by default and must be explicitly allowed in policy). CSP prevents a wide range of attacks,\n"
              "including Cross-site scripting and other cross-site injections. \033[4mhttps://wiki.owasp.org/index.php/OWASP_Secure_Headers_Project#tab=Headers\033[0m",
-  "XPerm": "TO-DO",#TODO
-  "Referrer": "TO-DO",#TODO
+  "Cache": "Recommended value: \"no-cache, no-store, must-revalidate\", \033[4mhttps://wiki.owasp.org/index.php/OWASP_Secure_Headers_Project#tab=Headers\033[0m\n",
+  #"XPerm": "TO-DO",#TODO
+  #"Referrer": "TO-DO",#TODO
   #Public Key Pinning Extension for HTTP (HPKP)
   #X-Permitted-Cross-Domain-Policies
   #Expect-CT
