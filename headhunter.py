@@ -6,12 +6,12 @@ import sys
 from definitions import *
 from utilities import *
 
-def report_on_missing_headers(url, require_description):
+def report_on_missing_headers(url, require_description, require_headers):
+    req = requests.get(url)
     print_underlined("Analyzing headers\n")
-    req =  requests.get(url)
     for header in SecHeaders:
         if require_description:
-            description = Fore.RED + "\nDescription:" + Style.RESET_ALL +SecHeadersDescriptions[header]
+            description = "\nDescription:" + SecHeadersDescriptions[header]
             tabbed = True
         else:
             description = ""
@@ -22,6 +22,10 @@ def report_on_missing_headers(url, require_description):
                HTTPHeaderEntries[header] + " not found" + description,
                tabbed)
     print('')
+    if require_headers: 
+        print_underlined("Printing headers\n")
+        print(req.headers)
+        print('')
 
 def report_on_cookies(url):
     print_underlined("Analyzing cookies\n")
@@ -64,6 +68,7 @@ def main(arg):
     parser.add_argument('-P', '--password', nargs='+', help="Password for basic-auth")
     #parser.add_argument('-x PROXY', '--proxy PROXY',required=False,nargs='+',help="Set the proxy server (example: 192.168.1.1:8080)")
     parser.add_argument('-d', '--definitions', action='store_true', help="Print the purpose and functionality of each missing header")
+    parser.add_argument('-H', '--headers', action='store_true', help="Print the security headers found")
     parser.add_argument('-a', '--addheader', action='store_true', help="Add HTTP header")
 
     args, unknown = parser.parse_known_args()
@@ -72,7 +77,7 @@ def main(arg):
     else:
         sys.exit('One URL argument required')
     print(requests.get(url))
-    report_on_missing_headers(url, args.definitions)
+    report_on_missing_headers(url, args.definitions, args.headers)
     report_on_cookies(url)
     if args.username or args.password: report_on_basic_auth(url, args.username, args.password)
     if args.addheader: add_transfer_encoding_header(url)
