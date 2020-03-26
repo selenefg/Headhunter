@@ -24,7 +24,8 @@ def report_on_missing_headers(url, require_description, require_headers):
     print('')
     if require_headers: 
         print_underlined("Printing headers\n")
-        print(req.headers)
+        for element in req.headers:
+            print(element + ": " + req.headers[element])
         print('')
 
 def report_on_cookies(url):
