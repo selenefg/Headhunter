@@ -77,6 +77,10 @@ def main(arg):
         url = arg[1]
     else:
         sys.exit('One URL argument required')
+    try: 
+        (requests.get(url))
+    except: 
+        sys.exit("Is your URL well written? Did you forget to add \"https://\"?")
     print(requests.get(url))
     report_on_missing_headers(url, args.definitions, args.headers)
     report_on_cookies(url)
