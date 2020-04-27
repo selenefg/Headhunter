@@ -53,6 +53,12 @@ def report_on_basic_auth(url, username, password):
         print(Fore.RED + "[Error] " + Style.RESET_ALL + "status code " + str(req.status_code))
     print('')
 
+def add_header(url, header):
+    print_underlined("Adding \"" + header + "\" header\n")
+    response = urllib.request.Request(url)
+    response.add_header(header)
+    print(response.headers)
+
 def add_transfer_encoding_header(url):
     print_underlined("Adding Transfer-Enconding header\n")
     response = urllib.request.Request(url)
@@ -65,14 +71,16 @@ def add_transfer_encoding_header(url):
 
 def main(arg):
     parser = argparse.ArgumentParser()
-    parser.add_argument('-U', '--username', nargs='+', help="Username for basic-auth")
-    parser.add_argument('-P', '--password', nargs='+', help="Password for basic-auth")
     #parser.add_argument('-x PROXY', '--proxy PROXY',required=False,nargs='+',help="Set the proxy server (example: 192.168.1.1:8080)")
     parser.add_argument('-d', '--definitions', action='store_true', help="Print the purpose and functionality of each missing header")
-    parser.add_argument('-H', '--headers', action='store_true', help="Print the security headers found")
-    parser.add_argument('-a', '--addheader', action='store_true', help="Add HTTP header")
+    parser.add_argument('-H', '--printheaders', action='store_true', help="Print the security headers found")
+    parser.add_argument('-U', '--username', nargs='+', help="Username for basic-auth")
+    parser.add_argument('-P', '--password', nargs='+', help="Password for basic-auth")
+    parser.add_argument('-a', '--addheader', nargs='?', help="Add a custom HTTP header")
+    parser.add_argument('-t', '--transferenconding', action='store_true', help="Perform an HTTP request smuggling attack by obfuscating the TE header")
 
     args, unknown = parser.parse_known_args()
+    
     if len(arg) > 1:        
         url = arg[1]
     else:
@@ -80,12 +88,14 @@ def main(arg):
     try: 
         (requests.get(url))
     except: 
-        sys.exit("Is your URL well written? Did you forget to add \"https://\"?")
+        sys.exit("URL failed")
+    
     print(requests.get(url))
-    report_on_missing_headers(url, args.definitions, args.headers)
+    report_on_missing_headers(url, args.definitions, args.printheaders)
     report_on_cookies(url)
     if args.username or args.password: report_on_basic_auth(url, args.username, args.password)
-    if args.addheader: add_transfer_encoding_header(url)
+    if args.addheader: add_header(url, args.addheader)
+    #if args.transferenconding: add_transfer_encoding_header(url)
 
 if __name__ == '__main__':
     main(sys.argv)
