@@ -1,6 +1,6 @@
 import argparse
 import requests
-from requests.auth import HTTPBasicAuth
+from requests.auth import *
 import urllib
 import sys
 from definitions import *
@@ -44,7 +44,7 @@ def report_on_cookies(url):
     print('')
 
 def report_on_basic_auth(url, username, password):
-    print_underlined("Testing basic_auth\n")
+    print_underlined("Testing basic authentication\n")
     req = requests.get(url, auth=HTTPBasicAuth(username, password))
     if req.status_code == 200:
         print("Username: " + str(username) + " / Password: " + str(password))
@@ -53,13 +53,24 @@ def report_on_basic_auth(url, username, password):
         print(Fore.RED + "[Error] " + Style.RESET_ALL + "status code " + str(req.status_code))
     print('')
 
-def add_header(url, header):
+def report_on_digest_auth(url, username, password):
+    print_underlined("Testing digest authentication\n")
+    req = requests.get(url, auth=HTTPDigestAuth(username, password))
+    if req.status_code == 200:
+        print("Username: " + str(username) + " / Password: " + str(password))
+        print(Fore.GREEN + "[Success] " + Style.RESET_ALL + "status code " + str(req.status_code))
+    else: 
+        print(Fore.RED + "[Error] " + Style.RESET_ALL + "status code " + str(req.status_code))
+    print('')
+
+
+def report_on_headers(url, header):
     print_underlined("Adding \"" + header + "\" header\n")
     response = urllib.request.Request(url)
     response.add_header(header)
     print(response.headers)
 
-def add_transfer_encoding_header(url):
+def report_on_transfer_encoding_header(url):
     print_underlined("Adding Transfer-Enconding header\n")
     response = urllib.request.Request(url)
     for header in TransferEncondingHeader:
@@ -71,11 +82,13 @@ def add_transfer_encoding_header(url):
 
 def main(arg):
     parser = argparse.ArgumentParser()
-    #parser.add_argument('-x PROXY', '--proxy PROXY',required=False,nargs='+',help="Set the proxy server (example: 192.168.1.1:8080)")
-    parser.add_argument('-d', '--definitions', action='store_true', help="Print the purpose and functionality of each missing header")
-    parser.add_argument('-H', '--printheaders', action='store_true', help="Print the security headers found")
-    parser.add_argument('-U', '--username', nargs='+', help="Username for basic-auth")
-    parser.add_argument('-P', '--password', nargs='+', help="Password for basic-auth")
+    parser.add_argument('-x', '--proxy',nargs='+',help="Set the proxy server (example: 192.168.1.1:8080)")
+    parser.add_argument('-d', '--definitions', help="Print the purpose and functionality of each missing header")
+    parser.add_argument('-H', '--printheaders', help="Print the security headers found")
+    parser.add_argument('-U', '--basicuser', nargs='+', help="Username for basic-auth")
+    parser.add_argument('-P', '--basicpass', nargs='+', help="Password for basic-auth")
+    parser.add_argument('-u', '--digestuser', nargs='+', help="Username for digest-auth")
+    parser.add_argument('-p', '--digestpass', nargs='+', help="Password for digest-auth")
     parser.add_argument('-a', '--addheader', nargs='?', help="Add a custom HTTP header")
     parser.add_argument('-t', '--transferenconding', action='store_true', help="Perform an HTTP request smuggling attack by obfuscating the TE header")
 
@@ -88,14 +101,18 @@ def main(arg):
     try: 
         (requests.get(url))
     except: 
-        sys.exit("URL failed")
+        sys.exit("URL failed. Did you add 'https://'?")
     
+    if args.proxy: 
+        session = requests.session()
+        print(session.get(url, proxies=args.proxy))
     print(requests.get(url))
     report_on_missing_headers(url, args.definitions, args.printheaders)
     report_on_cookies(url)
-    if args.username or args.password: report_on_basic_auth(url, args.username, args.password)
-    if args.addheader: add_header(url, args.addheader)
-    #if args.transferenconding: add_transfer_encoding_header(url)
+    if args.basicuser or args.basicpass: report_on_basic_auth(url, args.basicuser, args.basicpass)
+    if args.digestuser or args.digestpass: report_on_digest_auth(url, args.digestuser, args.digestpass)
+    if args.addheader: report_on_headers(url, args.addheader)
+    #if args.transferenconding: report_on_transfer_encoding_header(url)
 
 if __name__ == '__main__':
     main(sys.argv)
