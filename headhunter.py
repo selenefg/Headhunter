@@ -83,8 +83,8 @@ def report_on_transfer_encoding_header(url):
 def main(arg):
     parser = argparse.ArgumentParser()
     parser.add_argument('-x', '--proxy',nargs='+',help="Set the proxy server (example: 192.168.1.1:8080)")
-    parser.add_argument('-d', '--definitions', help="Print the purpose and functionality of each missing header")
-    parser.add_argument('-H', '--printheaders', help="Print the security headers found")
+    parser.add_argument('-d', '--definitions', action='store_true', help="Print the purpose and functionality of each missing header")
+    parser.add_argument('-H', '--printheaders',action='store_true', help="Print the security headers found")
     parser.add_argument('-U', '--basicuser', nargs='+', help="Username for basic-auth")
     parser.add_argument('-P', '--basicpass', nargs='+', help="Password for basic-auth")
     parser.add_argument('-u', '--digestuser', nargs='+', help="Username for digest-auth")
