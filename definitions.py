@@ -17,7 +17,7 @@ SecHeadersDescriptions = {
          "(or other complying user agents) should only interact with it using secure HTTPS connections, and never via\n"
          "the insecure HTTP protocol. \033[4mhttps://wiki.owasp.org/index.php/OWASP_Secure_Headers_Project#tab=Headers\033[0m\n"
          "Recommended value: \"strict-transport-security: max-age=31536000; includeSubDomains\".",
-  "XFrame": "\nX-Frame-Options response header improve the protection of web applications against Clickjacking.\n"
+  "XFrame": "\nX-Frame-Options response header improves the protection of web applications against Clickjacking.\n"
             "It declares a policy communicated from a host to the client browser on whether the browser must not\n"
             "display the transmitted content in frames of other web pages. \033[4mhttps://wiki.owasp.org/index.php/OWASP_Secure_Headers_Project#tab=Headers\033[0m\n"
             "Recommended value: \"x-frame-options: SAMEORIGIN; allow-from: DOMAIN; deny\".",
