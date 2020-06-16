@@ -1,13 +1,15 @@
 import argparse
 import requests
-from requests.auth import *
+import logging
+from requests.auth import HTTPDigestAuth
+from requests.auth import HTTPBasicAuth
 import urllib
 import sys
 from definitions import *
 from utilities import *
 
-def report_on_missing_headers(url, require_description, require_headers):
-    req = requests.get(url)
+def report_on_missing_headers(url, require_description, require_headers, auth):
+    req = requests.get(url, auth = auth)
     print_underlined("Analyzing headers\n")
     for header in SecHeaders:
         if require_description:
@@ -28,14 +30,14 @@ def report_on_missing_headers(url, require_description, require_headers):
             print(element + ": " + req.headers[element])
         print('')
 
-def report_on_cookies(url):
+def report_on_cookie_attributes(url, auth):
     print_underlined("Analyzing cookies\n")
     cookie_tests = [
         [lambda c: c.secure, "Secure", "Secure attribute missing"],
         [lambda c: 'httponly' in c._rest.keys(), "HTTPOnly", "HTTPOnly attribute missing"],
         [lambda c: c.domain_initial_dot, "Well defined domain", "Loosely defined domain"],
     ] 
-    req =  requests.get(url)
+    req =  requests.get(url, auth=auth)
     for cookie in req.cookies:
         print("Name:" + cookie.name)
         print("Value:" + cookie.value)
@@ -43,28 +45,13 @@ def report_on_cookies(url):
             report(cookie, test[0], test[1], test[2])
     print('')
 
-def report_on_basic_auth(url, username, password):
-    print_underlined("Testing basic authentication\n")
-    req = requests.get(url, auth=HTTPBasicAuth(username, password))
-    if req.status_code == 200:
-        print("Username: " + str(username) + " / Password: " + str(password))
-        print(Fore.GREEN + "[Success] " + Style.RESET_ALL + "status code " + str(req.status_code))
-    else: 
-        print(Fore.RED + "[Error] " + Style.RESET_ALL + "status code " + str(req.status_code))
-    print('')
+def report_on_added_cookies(url, cookie):
+    print_underlined("Adding \"" + cookie + "\"cookie\n")
+    response = urllib.request.Request(url)
+    response.add_header("New cookie", cookie)
+    print(response.header_items())
 
-def report_on_digest_auth(url, username, password):
-    print_underlined("Testing digest authentication\n")
-    req = requests.get(url, auth=HTTPDigestAuth(username, password))
-    if req.status_code == 200:
-        print("Username: " + str(username) + " / Password: " + str(password))
-        print(Fore.GREEN + "[Success] " + Style.RESET_ALL + "status code " + str(req.status_code))
-    else: 
-        print(Fore.RED + "[Error] " + Style.RESET_ALL + "status code " + str(req.status_code))
-    print('')
-
-
-def report_on_headers(url, header):
+def report_on_added_headers(url, header):
     print_underlined("Adding \"" + header + "\" header\n")
     response = urllib.request.Request(url)
     response.add_header(header)
@@ -81,16 +68,18 @@ def report_on_transfer_encoding_header(url):
     print(response.headers)
 
 def main(arg):
+    logging.basicConfig(level=logging.ERROR)
     parser = argparse.ArgumentParser()
     parser.add_argument('-x', '--proxy',nargs='+',help="Set the proxy server (example: 192.168.1.1:8080)")
     parser.add_argument('-d', '--definitions', action='store_true', help="Print the purpose and functionality of each missing header")
     parser.add_argument('-H', '--printheaders',action='store_true', help="Print the security headers found")
-    parser.add_argument('-U', '--basicuser', nargs='+', help="Username for basic-auth")
-    parser.add_argument('-P', '--basicpass', nargs='+', help="Password for basic-auth")
-    parser.add_argument('-u', '--digestuser', nargs='+', help="Username for digest-auth")
-    parser.add_argument('-p', '--digestpass', nargs='+', help="Password for digest-auth")
-    parser.add_argument('-a', '--addheader', nargs='?', help="Add a custom HTTP header")
-    parser.add_argument('-t', '--transferenconding', action='store_true', help="Perform an HTTP request smuggling attack by obfuscating the TE header")
+    parser.add_argument('-U', '--basicuser', nargs='?', help="Username for basic-auth")
+    parser.add_argument('-P', '--basicpass', nargs='?', help="Password for basic-auth")
+    parser.add_argument('-u', '--digestuser', nargs='?', help="Username for digest-auth")
+    parser.add_argument('-p', '--digestpass', nargs='?', help="Password for digest-auth")
+    parser.add_argument('-c', '--addcookies', nargs='?', help="Add a custom cookie")
+    parser.add_argument('-a', '--addheaders', nargs='?', help="Add a custom HTTP header")
+    #parser.add_argument('-t', '--transferenconding', action='store_true', help="Perform an HTTP request smuggling attack by obfuscating the TE header")
 
     args, unknown = parser.parse_known_args()
     
@@ -102,16 +91,21 @@ def main(arg):
         (requests.get(url))
     except: 
         sys.exit("URL failed. Did you add 'https://'?")
+
+    if args.basicuser is not None:
+        auth = HTTPBasicAuth(args.basicuser, args.basicpass)
+    elif args.digestuser is not None:
+        auth = HTTPDigestAuth(args.digestuser, args.digestpass)
     
     if args.proxy: 
         session = requests.session()
         print(session.get(url, proxies=args.proxy))
-    print(requests.get(url))
-    report_on_missing_headers(url, args.definitions, args.printheaders)
-    report_on_cookies(url)
-    if args.basicuser or args.basicpass: report_on_basic_auth(url, args.basicuser, args.basicpass)
-    if args.digestuser or args.digestpass: report_on_digest_auth(url, args.digestuser, args.digestpass)
-    if args.addheader: report_on_headers(url, args.addheader)
+    
+    print(requests.get(url, auth=auth))
+    report_on_missing_headers(url, args.definitions, args.printheaders, auth)
+    report_on_cookie_attributes(url, auth)
+    if args.addcookies: report_on_added_cookies(url, args.addcookies)
+    if args.addheaders: report_on_added_headers(url, args.addheaders)
     #if args.transferenconding: report_on_transfer_encoding_header(url)
 
 if __name__ == '__main__':
