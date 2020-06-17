@@ -70,7 +70,7 @@ def report_on_transfer_encoding_header(url):
 def main(arg):
     logging.basicConfig(level=logging.ERROR)
     parser = argparse.ArgumentParser()
-    parser.add_argument('-x', '--proxy',nargs='+',help="Set the proxy server (example: 192.168.1.1:8080)")
+    parser.add_argument('-x', '--proxy',nargs='?',help="Set the proxy server (example: 192.168.1.1:8080)")
     parser.add_argument('-d', '--definitions', action='store_true', help="Print the purpose and functionality of each missing header")
     parser.add_argument('-H', '--printheaders',action='store_true', help="Print the security headers found")
     parser.add_argument('-U', '--basicuser', nargs='?', help="Username for basic-auth")
@@ -79,7 +79,7 @@ def main(arg):
     parser.add_argument('-p', '--digestpass', nargs='?', help="Password for digest-auth")
     parser.add_argument('-c', '--addcookies', nargs='?', help="Add a custom cookie")
     parser.add_argument('-a', '--addheaders', nargs='?', help="Add a custom HTTP header")
-    #parser.add_argument('-t', '--transferenconding', action='store_true', help="Perform an HTTP request smuggling attack by obfuscating the TE header")
+    parser.add_argument('-t', '--transferenconding', action='store_true', help="Perform an HTTP request smuggling attack by obfuscating the TE header")
 
     args, unknown = parser.parse_known_args()
     
@@ -97,7 +97,7 @@ def main(arg):
     elif args.digestuser is not None:
         auth = HTTPDigestAuth(args.digestuser, args.digestpass)
     
-    if args.proxy: 
+    if args.proxy is not None: 
         session = requests.session()
         print(session.get(url, proxies=args.proxy))
     
