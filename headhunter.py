@@ -82,7 +82,6 @@ def main(arg):
     parser.add_argument('-t', '--transferenconding', action='store_true', help="Perform an HTTP request smuggling attack by obfuscating the TE header")
 
     args, unknown = parser.parse_known_args()
-    
     if len(arg) > 1:        
         url = arg[1]
     else:
@@ -96,6 +95,9 @@ def main(arg):
         auth = HTTPBasicAuth(args.basicuser, args.basicpass)
     elif args.digestuser is not None:
         auth = HTTPDigestAuth(args.digestuser, args.digestpass)
+    else:
+        auth = None
+
     
     if args.proxy is not None: 
         session = requests.session()
