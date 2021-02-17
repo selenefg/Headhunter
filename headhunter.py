@@ -42,7 +42,7 @@ def report_on_cookie_attributes(url, auth):
         print("Name:" + cookie.name)
         print("Value:" + cookie.value)
         for test in cookie_tests:
-            report(cookie, test[0], test[1], test[2])
+            cookie_report(cookie, test[0], test[1], test[2])
     print('')
 
 def report_on_added_cookies(url, cookie):
