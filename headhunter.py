@@ -34,7 +34,7 @@ def report_on_cookie_attributes(url, auth):
     print_underlined("Analyzing cookies\n")
     cookie_tests = [
         [lambda c: c.secure, "Secure", "Secure attribute missing"],
-        [lambda c: 'httponly' in c._rest.keys(), "HTTPOnly", "HTTPOnly attribute missing"],
+        [lambda c: 'Httponly' in c._rest.keys(), "HTTPOnly", "HTTPOnly attribute missing"],
         [lambda c: c.domain_initial_dot, "Well defined domain", "Loosely defined domain"],
     ] 
     req =  requests.get(url, auth=auth)
@@ -112,3 +112,4 @@ def main(arg):
 
 if __name__ == '__main__':
     main(sys.argv)
+    
